@@ -206,19 +206,24 @@
 
   /* ---------------------------------------------------- preguntas frecuentes */
   var faqButtons = Array.prototype.slice.call(document.querySelectorAll(".faq-q"));
+
+  function setFaq(btn, open) {
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    var panel = document.getElementById(btn.getAttribute("aria-controls"));
+    if (panel) {
+      panel.hidden = false;                   // el alto lo controla la clase, no el atributo
+      panel.classList.toggle("is-open", open);
+    }
+  }
+
+  // El marcado deja las respuestas visibles para quien no tenga JavaScript;
+  // al arrancar cerramos todas menos la que viene marcada como abierta.
   faqButtons.forEach(function (btn) {
+    setFaq(btn, btn.getAttribute("aria-expanded") === "true");
     btn.addEventListener("click", function () {
       var open = btn.getAttribute("aria-expanded") === "true";
-      faqButtons.forEach(function (other) {          // una abierta a la vez
-        other.setAttribute("aria-expanded", "false");
-        var panel = document.getElementById(other.getAttribute("aria-controls"));
-        if (panel) panel.hidden = true;
-      });
-      if (!open) {
-        btn.setAttribute("aria-expanded", "true");
-        var panel = document.getElementById(btn.getAttribute("aria-controls"));
-        if (panel) panel.hidden = false;
-      }
+      faqButtons.forEach(function (other) { setFaq(other, false); }); // una a la vez
+      if (!open) setFaq(btn, true);
     });
   });
 
@@ -303,6 +308,60 @@
         submit.textContent = t.submitted;
       }
     });
+  }
+
+  /* ------------------------------------------------------------- movimiento */
+  // Los bloques entran subiendo unos píxeles al asomarse en pantalla. El estado
+  // inicial lo pone el CSS (ver "Movimiento" en styles.css); acá solo se decide
+  // cuándo revelarlos y con cuánto retraso.
+  var REVELABLES = [
+    ".hero-copy > *", ".hero-media", ".label", ".about-copy > *", ".fact",
+    ".services-head > *", ".panorama", ".service", ".process-intro > *",
+    ".step", ".faq-item", ".h2-contact", ".contact-sub", ".channel", ".form-card"
+  ].join(",");
+
+  // Grupos que entran en cascada, no todos de golpe.
+  [".stats", ".facts", ".services", ".steps", ".faq", ".channels"].forEach(function (sel) {
+    var grupo = document.querySelector(sel);
+    if (!grupo) return;
+    Array.prototype.forEach.call(grupo.children, function (hijo, i) {
+      hijo.style.setProperty("--d", Math.min(i * 70, 420) + "ms");
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".hero-copy > *"), function (el, i) {
+    el.style.setProperty("--d", i * 90 + "ms");
+  });
+
+  var revelables = document.querySelectorAll(REVELABLES);
+  var quietud = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (quietud || !("IntersectionObserver" in window)) {
+    Array.prototype.forEach.call(revelables, function (el) { el.classList.add("is-visible"); });
+  } else {
+    var observador = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("is-visible");
+        observador.unobserve(e.target);        // se revela una sola vez
+      });
+    }, { threshold: 0.08, rootMargin: "0px 0px -10% 0px" });
+    Array.prototype.forEach.call(revelables, function (el) { observador.observe(el); });
+  }
+
+  // El encabezado gana una sombra tenue en cuanto la página se despega del inicio.
+  var cabecera = document.querySelector(".site-header");
+  var ticking = false;
+  function marcarCabecera() {
+    cabecera.classList.toggle("is-scrolled", window.scrollY > 24);
+    ticking = false;
+  }
+  if (cabecera) {
+    window.addEventListener("scroll", function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(marcarCabecera);
+    }, { passive: true });
+    marcarCabecera();
   }
 
   // Expuesto solo para las pruebas automatizadas del repositorio.
