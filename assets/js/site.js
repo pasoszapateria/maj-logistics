@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var WHATSAPP_OPERACIONES = "50687041885"; // +506 8704-1885
+  var WHATSAPP_CONTACTO = "50688450437"; // +506 8845-0437 — único número de contacto del sitio
 
   /* ------------------------------------------------------------ diccionarios */
   var SERVICES_ES = [
@@ -76,7 +76,7 @@
     aboutTitleA: "La logística no debería sentirse como una caja negra. ", aboutTitleB: "Hacemos visible el camino.",
     aboutP1: "Desde Limón acompañamos a empresas que necesitan importar, exportar y tomar decisiones con información clara. Nuestro trabajo combina criterio aduanero, orden documental y atención cercana.",
     aboutP2: "Doce años operando en el puerto por donde entra la mayoría de la carga del país. Revisamos la documentación antes de que el barco llegue, para que su mercancía no acumule días de almacenaje.",
-    legalLabel: "CÉDULA JURÍDICA", baseLabel: "UBICACIÓN", agentLabel: "AGENTE ADUANAL", opsLabel: "OPERACIONES", billingLabel: "CORREO ELECTRÓNICO",
+    legalLabel: "CÉDULA JURÍDICA", baseLabel: "UBICACIÓN", agentLabel: "AGENTE ADUANAL", billingLabel: "CORREO ELECTRÓNICO",
     servicesTitleA: "Precisión en cada ", servicesTitleB: "punto de control.",
     servicesSub: "Un servicio pensado para que cada paso esté documentado, entendido y en movimiento. Atendemos importadores establecidos, pymes que traen su primer contenedor y clientes internacionales.",
     processTitleA: "Una buena ruta empieza ", processTitleB: "escuchando.",
@@ -87,7 +87,7 @@
     formTitle: "Solicitar asesoría",
     fName: "NOMBRE", fCompany: "EMPRESA", fEmail: "CORREO", fPhone: "TELÉFONO",
     fService: "SERVICIO DE INTERÉS", fMessage: "DETALLE DEL EMBARQUE",
-    formNote: "Al enviar se abre WhatsApp con su mensaje listo para el número de operaciones. También puede escribirnos a majlogisticsfacturas@gmail.com.",
+    formNote: "Al enviar se abre WhatsApp con su mensaje listo para nuestro agente aduanal. También puede escribirnos a majlogisticsfacturas@gmail.com.",
     formError: "Indique su nombre, un medio de contacto (correo o teléfono) y el detalle del embarque.",
     submit: "Enviar por WhatsApp", submitted: "Abriendo WhatsApp ✓",
     waIntro: "Hola M.A.J Logistics, escribo desde la página web.",
@@ -108,7 +108,7 @@
     aboutTitleA: "Logistics should not feel like a black box. ", aboutTitleB: "We make the route visible.",
     aboutP1: "From Limón we support companies that need to import, export and make decisions with clear information. Our work combines customs judgment, documentary order and close attention.",
     aboutP2: "Twelve years working at the port where most of the country's cargo arrives. We review documentation before the vessel lands, so your goods do not pile up storage days.",
-    legalLabel: "COMPANY ID", baseLabel: "LOCATION", agentLabel: "CUSTOMS BROKER", opsLabel: "OPERATIONS", billingLabel: "EMAIL",
+    legalLabel: "COMPANY ID", baseLabel: "LOCATION", agentLabel: "CUSTOMS BROKER", billingLabel: "EMAIL",
     servicesTitleA: "Precision at every ", servicesTitleB: "control point.",
     servicesSub: "A service built so every step is documented, understood and moving. We serve established importers, SMEs bringing in their first container and international clients.",
     processTitleA: "A good route starts ", processTitleB: "with listening.",
@@ -119,7 +119,7 @@
     formTitle: "Request advice",
     fName: "NAME", fCompany: "COMPANY", fEmail: "EMAIL", fPhone: "PHONE",
     fService: "SERVICE NEEDED", fMessage: "SHIPMENT DETAILS",
-    formNote: "Sending opens WhatsApp with your message ready for our operations number. You can also write to majlogisticsfacturas@gmail.com.",
+    formNote: "Sending opens WhatsApp with your message ready for our customs broker. You can also write to majlogisticsfacturas@gmail.com.",
     formError: "Please add your name, a way to reach you (email or phone) and the shipment details.",
     submit: "Send via WhatsApp", submitted: "Opening WhatsApp ✓",
     waIntro: "Hello M.A.J Logistics, I am writing from your website.",
@@ -262,7 +262,7 @@
   }
 
   function whatsappUrl(message) {
-    return "https://wa.me/" + WHATSAPP_OPERACIONES + "?text=" + encodeURIComponent(message);
+    return "https://wa.me/" + WHATSAPP_CONTACTO + "?text=" + encodeURIComponent(message);
   }
 
   var form = document.getElementById("contact-form");
