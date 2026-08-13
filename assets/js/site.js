@@ -64,7 +64,7 @@
   ];
 
   var ES = {
-    docTitle: "M.A.J Logistics S.A · Agencia aduanal en Limón, Costa Rica",
+    docTitle: "M.A.J Logistics S.A · Asesores aduaneros en Limón, Costa Rica",
     docDesc: "Asesoría aduanera en Limón, Costa Rica. Desalmacenaje, clasificación arancelaria, importación marítima y aérea, tránsito aduanero y transporte terrestre. 12 años de experiencia.",
     navAbout: "Sobre M.A.J", navServices: "Servicios", navProcess: "Cómo trabajamos", navContact: "Contacto",
     navMenu: "Abrir menú",
@@ -76,7 +76,7 @@
     aboutTitleA: "La logística no debería sentirse como una caja negra. ", aboutTitleB: "Hacemos visible el camino.",
     aboutP1: "Desde Limón acompañamos a empresas que necesitan importar, exportar y tomar decisiones con información clara. Nuestro trabajo combina criterio aduanero, orden documental y atención cercana.",
     aboutP2: "Doce años operando en el puerto por donde entra la mayoría de la carga del país. Revisamos la documentación antes de que el barco llegue, para que su mercancía no acumule días de almacenaje.",
-    baseLabel: "UBICACIÓN", agentLabel: "AGENTE ADUANAL", billingLabel: "CORREO ELECTRÓNICO",
+    baseLabel: "UBICACIÓN", agentLabel: "ASESOR ADUANAL", billingLabel: "CORREO ELECTRÓNICO",
     servicesTitleA: "Precisión en cada ", servicesTitleB: "punto de control.",
     servicesSub: "Un servicio pensado para que cada paso esté documentado, entendido y en movimiento. Atendemos importadores establecidos, pymes que traen su primer contenedor y clientes internacionales.",
     processTitleA: "Una buena ruta empieza ", processTitleB: "escuchando.",
@@ -87,28 +87,28 @@
     formTitle: "Solicitar asesoría",
     fName: "NOMBRE", fCompany: "EMPRESA", fEmail: "CORREO", fPhone: "TELÉFONO",
     fService: "SERVICIO DE INTERÉS", fMessage: "DETALLE DEL EMBARQUE",
-    formNote: "Al enviar se abre WhatsApp con su mensaje listo para nuestro agente aduanal. También puede escribirnos a majlogisticsfacturas@gmail.com.",
+    formNote: "Al enviar se abre WhatsApp con su mensaje listo para nuestro asesor aduanal. También puede escribirnos a majlogisticsfacturas@gmail.com.",
     formError: "Indique su nombre, un medio de contacto (correo o teléfono) y el detalle del embarque.",
-    submit: "Enviar por WhatsApp", submitted: "Abriendo WhatsApp ✓",
+    submit: "Enviar", submitted: "Abriendo WhatsApp ✓",
     waIntro: "Hola M.A.J Logistics, escribo desde la página web.",
     waName: "Nombre", waCompany: "Empresa", waService: "Servicio",
     waEmail: "Correo", waPhone: "Teléfono", waDetail: "Detalle"
   };
 
   var EN = {
-    docTitle: "M.A.J Logistics S.A · Customs broker in Limón, Costa Rica",
-    docDesc: "Customs brokerage in Limón, Costa Rica. Clearance, tariff classification, ocean and air import, customs transit and inland transport. 12 years of experience.",
+    docTitle: "M.A.J Logistics S.A · Customs advisors in Limón, Costa Rica",
+    docDesc: "Customs advisory in Limón, Costa Rica. Clearance, tariff classification, ocean and air import, customs transit and inland transport. 12 years of experience.",
     navAbout: "About M.A.J", navServices: "Services", navProcess: "How we work", navContact: "Contact",
     navMenu: "Open menu",
     labelAbout: "ABOUT M.A.J", labelServices: "WHAT WE DO", labelProcess: "HOW WE WORK", labelContact: "CONTACT",
     heroA: "Every shipment deserves ", heroB: "a clear route.",
-    heroSub: "Customs brokerage to move your goods with precision, local backing and communication that does not get lost along the way.",
+    heroSub: "Customs advisory to move your goods with precision, local backing and communication that does not get lost along the way.",
     ctaPrimary: "Let's talk", ctaSecondary: "See services",
     stat1: "years of experience", stat2: "local operation in Limón", stat3: "customs services",
     aboutTitleA: "Logistics should not feel like a black box. ", aboutTitleB: "We make the route visible.",
     aboutP1: "From Limón we support companies that need to import, export and make decisions with clear information. Our work combines customs judgment, documentary order and close attention.",
     aboutP2: "Twelve years working at the port where most of the country's cargo arrives. We review documentation before the vessel lands, so your goods do not pile up storage days.",
-    baseLabel: "LOCATION", agentLabel: "CUSTOMS BROKER", billingLabel: "EMAIL",
+    baseLabel: "LOCATION", agentLabel: "CUSTOMS ADVISOR", billingLabel: "EMAIL",
     servicesTitleA: "Precision at every ", servicesTitleB: "control point.",
     servicesSub: "A service built so every step is documented, understood and moving. We serve established importers, SMEs bringing in their first container and international clients.",
     processTitleA: "A good route starts ", processTitleB: "with listening.",
@@ -119,9 +119,9 @@
     formTitle: "Request advice",
     fName: "NAME", fCompany: "COMPANY", fEmail: "EMAIL", fPhone: "PHONE",
     fService: "SERVICE NEEDED", fMessage: "SHIPMENT DETAILS",
-    formNote: "Sending opens WhatsApp with your message ready for our customs broker. You can also write to majlogisticsfacturas@gmail.com.",
+    formNote: "Sending opens WhatsApp with your message ready for our customs advisor. You can also write to majlogisticsfacturas@gmail.com.",
     formError: "Please add your name, a way to reach you (email or phone) and the shipment details.",
-    submit: "Send via WhatsApp", submitted: "Opening WhatsApp ✓",
+    submit: "Send", submitted: "Opening WhatsApp ✓",
     waIntro: "Hello M.A.J Logistics, I am writing from your website.",
     waName: "Name", waCompany: "Company", waService: "Service",
     waEmail: "Email", waPhone: "Phone", waDetail: "Details"
@@ -186,10 +186,14 @@
 
     try { localStorage.setItem("maj-lang", next); } catch (e) { /* modo privado */ }
 
-    var url = new URL(window.location.href);
-    if (next === "en") url.searchParams.set("lang", "en");
-    else url.searchParams.delete("lang");
-    history.replaceState(null, "", url.pathname + url.search + url.hash);
+    // Al abrir el archivo desde el disco (file://) algunos navegadores no permiten
+    // reescribir la dirección; el idioma ya quedó aplicado igual.
+    try {
+      var url = new URL(window.location.href);
+      if (next === "en") url.searchParams.set("lang", "en");
+      else url.searchParams.delete("lang");
+      history.replaceState(null, "", url.pathname + url.search + url.hash);
+    } catch (e) { /* sin reescribir la dirección */ }
   }
 
   document.querySelectorAll(".pill").forEach(function (btn) {
@@ -300,8 +304,12 @@
       if (error) error.hidden = true;
 
       var url = whatsappUrl(buildMessage(data, t));
-      var win = window.open(url, "_blank", "noopener");
-      if (!win) window.location.href = url;   // si el navegador bloquea la pestaña
+      // Ojo: pasar "noopener" como opción hace que window.open devuelva null aunque la
+      // pestaña sí se abra, y entonces el respaldo de abajo se dispararía siempre,
+      // sacando al visitante de la página. Se corta la referencia a mano.
+      var win = window.open(url, "_blank");
+      if (win) win.opener = null;
+      else window.location.href = url;        // solo si el navegador bloqueó la pestaña
 
       if (submit) {
         submit.dataset.sent = "1";
