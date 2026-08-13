@@ -706,6 +706,123 @@ section[id] { scroll-margin-top: 76px; }
 .footer-meta { font-size: 13px; }
 
 /* ==========================================================================
+   Movimiento
+
+   Reglas de la casa:
+   - Todo cuelga de `.js`, clase que un script del <head> pone antes de pintar.
+     Sin JavaScript no hay estado inicial invisible y el sitio se ve completo.
+   - Las transiciones viven dentro de `prefers-reduced-motion: no-preference`.
+     La estructura (acordeón, menú) queda fuera, para que siga funcionando
+     aunque el usuario haya pedido menos movimiento en su sistema.
+   - Solo se animan `opacity` y `transform`: no obligan al navegador a
+     recalcular la página y van fluidos en celulares modestos.
+   ========================================================================== */
+
+/* --- estructura del acordeón: colapso sin depender de la animación --- */
+.js .faq-a {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+/* El relleno inferior se aplica solo al abrir: con box-sizing: border-box un
+   elemento no puede medir menos que su propio relleno, y el panel cerrado se
+   quedaba con 20 px de alto. */
+.js .faq-a > p { overflow: hidden; padding-bottom: 0; }
+.js .faq-a.is-open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+.js .faq-a.is-open > p { padding-bottom: 20px; }
+
+@media (prefers-reduced-motion: no-preference) {
+
+  /* --- entrada: los bloques suben unos píxeles mientras aparecen --- */
+  .js .hero-copy > *,
+  .js .hero-media,
+  .js .label,
+  .js .about-copy > *,
+  .js .fact,
+  .js .services-head > *,
+  .js .panorama,
+  .js .service,
+  .js .process-intro > *,
+  .js .step,
+  .js .faq-item,
+  .js .h2-contact,
+  .js .contact-sub,
+  .js .channel,
+  .js .form-card {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 640ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 640ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition-delay: var(--d, 0ms);
+  }
+
+  .js .is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* --- fotografías: se asientan desde un zoom mínimo --- */
+  .js .frame { overflow: hidden; }
+  .js .frame img {
+    transform: scale(1.06);
+    transition: transform 1300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition-delay: var(--d, 0ms);
+  }
+  .js .is-visible .frame img,
+  .js .frame.is-visible img { transform: none; }
+
+  /* --- encabezado: gana una sombra tenue al despegarse del inicio --- */
+  .site-header { transition: background-color 300ms ease, box-shadow 300ms ease; }
+  .site-header.is-scrolled {
+    background: rgba(238, 241, 248, 0.96);
+    box-shadow: 0 12px 30px -24px rgba(11, 31, 77, 0.65);
+  }
+
+  /* --- acordeón y menú --- */
+  .js .faq-a {
+    transition: grid-template-rows 360ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                visibility 0s linear 360ms;
+  }
+  .js .faq-a.is-open { transition-delay: 0s; }
+  .js .faq-a > p { transition: padding-bottom 360ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+}
+
+/* --- respuesta al cursor (solo donde hay uno de verdad) --- */
+@media (hover: hover) and (pointer: fine) {
+  .service { transition: background-color 260ms ease; }
+  .service:hover { background-color: rgba(17, 82, 204, 0.04); }
+  .service-icon {
+    transition: transform 260ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                border-color 260ms ease, color 260ms ease;
+  }
+  .service:hover .service-icon { transform: translateY(-3px); border-color: var(--blue); }
+  .service-title { transition: color 220ms ease; }
+  .service:hover .service-title { color: var(--blue); }
+
+  .btn-primary { transition: background-color 220ms ease, transform 220ms ease; }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-arrow { transition: transform 220ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+  .btn-primary:hover .btn-arrow { transform: translate(3px, -3px); }
+
+  .btn-link { transition: color 200ms ease, border-color 200ms ease; }
+  .form-submit { transition: background-color 220ms ease, transform 220ms ease; }
+  .form-submit:hover { transform: translateY(-2px); }
+
+  .pill { transition: background-color 200ms ease, color 200ms ease; }
+  .site-nav a,
+  .channel-value a,
+  .fact-value a,
+  .faq-q { transition: color 200ms ease; }
+  .brand img { transition: opacity 220ms ease; }
+  .brand:hover img { opacity: 0.75; }
+
+  .frame img { backface-visibility: hidden; }
+}
+
+/* ==========================================================================
    Adaptación a pantallas pequeñas (añadido: el prototipo era solo escritorio)
    ========================================================================== */
 
@@ -741,7 +858,7 @@ section[id] { scroll-margin-top: 76px; }
   #sobre .container,
   #servicios .container,
   #proceso .container { padding-top: 56px; padding-bottom: 60px; }
-  .contact .container { padding-top: 56px; padding-bottom: 64px; }
+  .contact .container { padding-top: 56px; padding-bottom: 40px; }
 
   .panorama { margin: 32px 0 4px; }
   .faq { padding-top: 28px; }
@@ -759,14 +876,22 @@ section[id] { scroll-margin-top: 76px; }
     top: 100%;
     left: 0;
     right: 0;
-    display: none;
+    display: flex;
     flex-direction: column;
     gap: 0;
     background: var(--bg);
     border-bottom: 1px solid var(--line);
     padding: 6px var(--gutter) 14px;
+    /* Se despliega con opacidad en vez de display, para poder animarlo. */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
   }
-  .site-nav.is-open { display: flex; }
+  .site-nav.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
   .site-nav a {
     padding: 13px 0;
     font-size: 16px;
@@ -807,7 +932,8 @@ section[id] { scroll-margin-top: 76px; }
     padding-top: 34px;
     padding-bottom: 34px;
   }
-  .footer-logo { height: 44px; margin-right: 0; width: 100%; max-width: 240px; }
+  /* Solo se fija el ancho: dar ancho y alto a la vez deformaba el logo (420x142). */
+  .footer-logo { width: 190px; height: auto; margin-right: 0; }
 }
 
 @media (max-width: 380px) {
@@ -815,9 +941,21 @@ section[id] { scroll-margin-top: 76px; }
   .pill { padding: 6px 10px; }
 }
 
+@media (max-width: 700px) and (prefers-reduced-motion: no-preference) {
+  .site-nav {
+    transition: opacity 220ms ease,
+                transform 280ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                visibility 0s linear 280ms;
+  }
+  .site-nav.is-open { transition-delay: 0s; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  * { transition-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 @media print {
