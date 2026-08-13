@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Evita que iOS convierta la cédula jurídica en un enlace de llamada.
+     Los teléfonos reales del sitio son enlaces explícitos a wa.me y no se ven afectados. -->
+<meta name="format-detection" content="telephone=no">
 
 <!-- ==========================================================================
      Si cambia la dirección del sitio (otro repositorio o un dominio propio),
@@ -36,6 +39,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/styles.css">
+
+<!-- Marca que hay JavaScript ANTES de pintar: las animaciones de entrada parten de
+     invisible, y sin esta clase el contenido se mostraría igual (sitio sin JS intacto). -->
+<script>document.documentElement.className += " js";</script>
 
 <script type="application/ld+json">
 {
@@ -347,7 +354,7 @@
                 <span class="faq-sign" aria-hidden="true">+</span>
               </button>
             </h3>
-            <section class="faq-a" id="faq-panel-1" aria-labelledby="faq-btn-1" hidden>
+            <section class="faq-a" id="faq-panel-1" aria-labelledby="faq-btn-1">
               <p data-i18n="faqA1">Factura comercial, conocimiento de embarque (BL o guía aérea), lista de empaque y, según el producto, certificados de origen o permisos sanitarios.</p>
             </section>
           </div>
@@ -359,7 +366,7 @@
                 <span class="faq-sign" aria-hidden="true">+</span>
               </button>
             </h3>
-            <section class="faq-a" id="faq-panel-2" aria-labelledby="faq-btn-2" hidden>
+            <section class="faq-a" id="faq-panel-2" aria-labelledby="faq-btn-2">
               <p data-i18n="faqA2">Sí. Si es su primera importación le indicamos paso a paso los registros que necesita y qué esperar en cada etapa.</p>
             </section>
           </div>
@@ -371,7 +378,7 @@
                 <span class="faq-sign" aria-hidden="true">+</span>
               </button>
             </h3>
-            <section class="faq-a" id="faq-panel-3" aria-labelledby="faq-btn-3" hidden>
+            <section class="faq-a" id="faq-panel-3" aria-labelledby="faq-btn-3">
               <p data-i18n="faqA3">Se cotiza por operación según el tipo de carga y el trámite requerido. Los impuestos y gastos portuarios se facturan aparte, con su respectivo comprobante.</p>
             </section>
           </div>
@@ -383,7 +390,7 @@
                 <span class="faq-sign" aria-hidden="true">+</span>
               </button>
             </h3>
-            <section class="faq-a" id="faq-panel-4" aria-labelledby="faq-btn-4" hidden>
+            <section class="faq-a" id="faq-panel-4" aria-labelledby="faq-btn-4">
               <p data-i18n="faqA4">Sí, coordinamos con proveedores y agentes en el exterior, y podemos atender la comunicación en inglés.</p>
             </section>
           </div>
