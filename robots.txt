@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pasoszapateria.github.io/maj-logistics/sitemap.xml
