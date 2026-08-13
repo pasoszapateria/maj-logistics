@@ -12,8 +12,6 @@
   --ink: #0b1f4d;
   --ink-2: #43507a;
   --ink-3: #5c6a8c;
-  --ink-4: #8b97b8;
-  --ink-note: #6b779b; /* variante de --ink-4 con contraste suficiente */
   --blue: #1152cc;
   --blue-soft: #a9c4f5;
   --blue-pale: #d3e0fa;
@@ -315,7 +313,7 @@ section[id] { scroll-margin-top: 76px; }
   letter-spacing: 0.14em;
   color: var(--blue);
 }
-.label-muted { color: var(--ink-4); }
+.label-muted { color: var(--ink-3); }
 .label-contact { color: var(--blue-soft); }
 
 .body-lg {
@@ -370,7 +368,7 @@ section[id] { scroll-margin-top: 76px; }
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.14em;
-  color: var(--ink-4);
+  color: var(--ink-3);
 }
 .fact-value {
   margin: 0;
@@ -589,7 +587,7 @@ section[id] { scroll-margin-top: 76px; }
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.16em;
-  color: var(--blue-soft);
+  color: var(--blue-pale);
 }
 .channel-value {
   margin: 0;
@@ -629,7 +627,7 @@ section[id] { scroll-margin-top: 76px; }
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.12em;
-  color: var(--ink-4);
+  color: var(--ink-3);
 }
 .field input,
 .field select {
@@ -642,7 +640,16 @@ section[id] { scroll-margin-top: 76px; }
   outline: none;
   border-radius: 0;
 }
-.field select { appearance: none; }
+/* Se quita la flecha del sistema para que el campo case con los demás, pero hay que
+   reponer una propia: sin ninguna, el desplegable se lee como texto fijo. */
+.field select {
+  appearance: none;
+  padding-right: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' fill='none' stroke='%235c6a8c' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1px center;
+  cursor: pointer;
+}
 .field textarea {
   border: 1px solid var(--line-2);
   padding: 11px 12px;
@@ -680,7 +687,7 @@ section[id] { scroll-margin-top: 76px; }
 .form-note {
   font-size: 12.5px;
   line-height: 1.55;
-  color: var(--ink-note);
+  color: var(--ink-3);
 }
 
 /* -------------------------------------------------------------- pie de pág. */
@@ -961,4 +968,20 @@ section[id] { scroll-margin-top: 76px; }
 @media print {
   .site-header, .nav-toggle, .lang, .form-submit { display: none; }
   body { background: #fff; }
+
+  /* Las animaciones dejan los bloques invisibles hasta que se ven en pantalla, y al
+     imprimir nunca "se ven": sin esto, todo lo que no se hubiera recorrido antes
+     saldría en blanco. También se abren todas las respuestas del acordeón. */
+  .js *,
+  .js .faq-a {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    /* Sin esto la opacidad *empieza* a animarse hacia 1 y la impresión puede
+       capturarla a medio camino, o directamente en 0. */
+    transition: none !important;
+    animation: none !important;
+  }
+  .js .faq-a { grid-template-rows: 1fr !important; }
+  .js .faq-a > p { padding-bottom: 16px !important; }
 }
