@@ -1013,3 +1013,26 @@ section[id] { scroll-margin-top: 76px; }
   .js .faq-a { grid-template-rows: 1fr !important; }
   .js .faq-a > p { padding-bottom: 16px !important; }
 }
+
+/* Avisos bajo los campos, campos opcionales por servicio, acciones de contacto, botón flotante */
+.field-msg { font-size: 12.5px; line-height: 1.4; color: #c0392b; }
+.field-msg[hidden] { display: none; }
+.field-msg button { all: unset; cursor: pointer; text-decoration: underline; }
+input[aria-invalid="true"] { border-bottom-color: #c0392b; }
+.svc-extra { display: flex; flex-direction: column; gap: 14px; }
+.svc-extra .form-row[hidden] { display: none; }
+.field-wide { grid-column: 1 / -1; }
+.channel-actions {
+  margin: 0; display: flex; gap: 10px; align-items: center;
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; color: var(--blue-pale);
+}
+.channel-actions a { color: var(--white); text-decoration: underline; text-underline-offset: 3px; }
+.channel-actions a:hover { color: var(--blue-pale); }
+.wa-fab {
+  position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center;
+  background: #25d366; color: #fff; box-shadow: 0 6px 20px rgba(11, 31, 77, 0.28);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.wa-fab.is-hidden { opacity: 0; transform: scale(0.8); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .wa-fab { transition: none; } }

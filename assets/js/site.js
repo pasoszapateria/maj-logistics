@@ -93,7 +93,15 @@
     waIntro: "Hola M.A.J Logistics, escribo desde la página web.",
     waName: "Nombre", waCompany: "Empresa", waService: "Servicio",
     waEmail: "Correo", waPhone: "Teléfono", waDetail: "Detalle",
-    ccSearch: "Buscar país…", ccLabel: "País"
+    ccSearch: "Buscar país…", ccLabel: "País",
+    xBl: "N.º DE BL O CONTENEDOR (OPCIONAL)", xPort: "PUERTO DE ORIGEN (OPCIONAL)",
+    xAwb: "N.º DE GUÍA AÉREA (OPCIONAL)", xAirport: "AEROPUERTO DE ORIGEN (OPCIONAL)",
+    xProduct: "DESCRIPCIÓN DEL PRODUCTO (OPCIONAL)",
+    waBl: "BL / contenedor", waPort: "Puerto de origen", waAwb: "Guía aérea",
+    waAirport: "Aeropuerto de origen", waProduct: "Producto",
+    callLabel: "Llamar", saveLabel: "Guardar contacto", fabLabel: "Escribir por WhatsApp",
+    vEmail: "Revise el correo: parece incompleto.", vEmailDid: "¿Quiso decir",
+    vPhone: "El número parece incompleto para este país."
   };
 
   var EN = {
@@ -126,7 +134,15 @@
     waIntro: "Hello M.A.J Logistics, I am writing from your website.",
     waName: "Name", waCompany: "Company", waService: "Service",
     waEmail: "Email", waPhone: "Phone", waDetail: "Details",
-    ccSearch: "Search country…", ccLabel: "Country"
+    ccSearch: "Search country…", ccLabel: "Country",
+    xBl: "BL OR CONTAINER NO. (OPTIONAL)", xPort: "PORT OF ORIGIN (OPTIONAL)",
+    xAwb: "AIR WAYBILL NO. (OPTIONAL)", xAirport: "AIRPORT OF ORIGIN (OPTIONAL)",
+    xProduct: "PRODUCT DESCRIPTION (OPTIONAL)",
+    waBl: "BL / container", waPort: "Port of origin", waAwb: "Air waybill",
+    waAirport: "Airport of origin", waProduct: "Product",
+    callLabel: "Call", saveLabel: "Save contact", fabLabel: "Message us on WhatsApp",
+    vEmail: "Please check the email: it looks incomplete.", vEmailDid: "Did you mean",
+    vPhone: "This number looks incomplete for this country."
   };
 
   function expand(dict, services, steps, faqs) {
@@ -198,15 +214,36 @@
   // Aplica la máscara; el separador solo aparece cuando viene otro dígito detrás,
   // así el botón de borrar no se atasca en un guion.
   function formatPhone(iso, raw) {
-    var digits = raw.replace(/\D/g, "").replace(/^0+/, "");
+    var digits = raw.replace(/\D/g, "");
     var mask = MASK[iso];
-    if (!mask) return digits;
+    if (!mask) {
+      digits = digits.replace(/^0+/, "");
+      if (window.libphonenumber && digits) {
+        // Se formatea como número internacional y se le quita el prefijo: así agrupa bien
+        // aunque el cliente no escriba el 0 nacional (Alemania, Emiratos, Nigeria…).
+        try {
+          var prefix = "+" + DIAL[iso];
+          var out = new libphonenumber.AsYouType().input(prefix + digits);
+          if (out.indexOf(prefix) === 0) return out.slice(prefix.length).trim();
+        } catch (e) { /* cae a dígitos */ }
+      }
+      return digits;
+    }
+    digits = digits.replace(/^0+/, "");
     var out = "", d = 0;
     for (var i = 0; i < mask.length && d < digits.length; i++) {
       if (mask.charAt(i) === "#") out += digits.charAt(d++);
       else out += mask.charAt(i);
     }
     return out + digits.slice(d);
+  }
+  // true = válido, false = incompleto o imposible, null = no se puede saber (sin librería)
+  function phoneIsValid(iso, text) {
+    if (!window.libphonenumber) return null;
+    try {
+      var n = libphonenumber.parsePhoneNumberFromString(text, iso);
+      return !!(n && n.isValid());
+    } catch (e) { return null; }
   }
 
   var country = { iso: "CR", list: [], active: 0 };
@@ -446,6 +483,7 @@
     lines.push(t.waName + ": " + data.nombre);
     if (data.empresa) lines.push(t.waCompany + ": " + data.empresa);
     lines.push(t.waService + ": " + data.servicio);
+    data.extras.forEach(function (x) { lines.push(t[x.label] + ": " + x.value); });
     if (data.correo) lines.push(t.waEmail + ": " + data.correo);
     if (data.telefono) lines.push(t.waPhone + ": " + data.telefono);
     lines.push("", t.waDetail + ": " + data.detalle);
@@ -456,7 +494,125 @@
     return "https://wa.me/" + WHATSAPP_CONTACTO + "?text=" + encodeURIComponent(message);
   }
 
+  /* ------------------------------------------- avisos, extras por servicio, borrador */
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var EMAIL_TYPOS = {
+    "gmial.com": "gmail.com", "gmai.com": "gmail.com", "gmail.co": "gmail.com", "gnail.com": "gmail.com",
+    "gmail.con": "gmail.com", "hotmial.com": "hotmail.com", "hotmail.con": "hotmail.com",
+    "hotmai.com": "hotmail.com", "yahooo.com": "yahoo.com", "yaho.com": "yahoo.com",
+    "outlok.com": "outlook.com", "outlook.con": "outlook.com", "icloud.con": "icloud.com"
+  };
+  function showMsg(id, input, html) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = "";
+    if (html) {
+      if (typeof html === "string") el.textContent = html;
+      else el.appendChild(html);
+    }
+    el.hidden = !html;
+    input.setAttribute("aria-invalid", html ? "true" : "false");
+  }
+  // Devuelve true si el correo está bien (o vacío). Con show=true pinta el aviso.
+  function checkEmail(show) {
+    var input = form && form.correo, t = DICT[lang];
+    if (!input) return true;
+    var v = input.value.trim();
+    if (!v) { showMsg("msg-correo", input, ""); return true; }
+    if (!EMAIL_RE.test(v)) { if (show) showMsg("msg-correo", input, t.vEmail); return false; }
+    var domain = v.split("@")[1].toLowerCase();
+    if (EMAIL_TYPOS[domain]) {
+      if (show) {
+        var fixed = v.split("@")[0] + "@" + EMAIL_TYPOS[domain];
+        var wrap = document.createElement("span");
+        wrap.appendChild(document.createTextNode(t.vEmailDid + " "));
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = fixed;
+        btn.addEventListener("click", function () {
+          input.value = fixed; showMsg("msg-correo", input, ""); saveDraft();
+        });
+        wrap.appendChild(btn);
+        wrap.appendChild(document.createTextNode("?"));
+        showMsg("msg-correo", input, wrap);
+      }
+      return true;   // es un correo válido; solo se sugiere
+    }
+    showMsg("msg-correo", input, "");
+    return true;
+  }
+  function checkPhone(show) {
+    var input = form && form.telefono, t = DICT[lang];
+    if (!input) return true;
+    var v = input.value.trim();
+    if (!v) { showMsg("msg-telefono", input, ""); return true; }
+    var ok = phoneIsValid(country.iso, v.charAt(0) === "+" ? v : "+" + DIAL[country.iso] + v.replace(/\D/g, "").replace(/^0+/, ""));
+    if (ok === false) { if (show) showMsg("msg-telefono", input, t.vPhone); return false; }
+    showMsg("msg-telefono", input, "");
+    return true;
+  }
+
+  // Campos opcionales según el servicio (0 desalmacenaje, 1 clasificación, 2 marítima, 3 aérea…)
+  function updateExtras() {
+    var sel = document.getElementById("svc-select");
+    if (!sel) return;
+    document.querySelectorAll("#svc-extra [data-svc]").forEach(function (row) {
+      row.hidden = row.getAttribute("data-svc") !== String(sel.selectedIndex);
+    });
+  }
+  function visibleExtras() {
+    var out = [];
+    document.querySelectorAll("#svc-extra [data-svc]:not([hidden]) input").forEach(function (inp) {
+      var v = inp.value.trim();
+      if (v) out.push({ label: inp.getAttribute("data-label"), value: v });
+    });
+    return out;
+  }
+
+  // Borrador: lo escrito sobrevive a un cierre accidental de la pestaña.
+  var DRAFT_KEY = "maj-draft";
+  var DRAFT_FIELDS = ["nombre", "empresa", "correo", "telefono", "detalle", "x_bl", "x_puerto", "x_guia", "x_aeropuerto", "x_producto"];
+  function saveDraft() {
+    if (!form) return;
+    var d = { pais: country.iso, servicio: form.servicio.selectedIndex };
+    DRAFT_FIELDS.forEach(function (n) { d[n] = form[n].value; });
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } catch (e) { /* modo privado */ }
+  }
+  function clearDraft() {
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* modo privado */ }
+  }
+  function restoreDraft() {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) { d = null; }
+    if (!d) return;
+    if (d.pais && DIAL[d.pais]) { country.iso = d.pais; paintButton(); }
+    DRAFT_FIELDS.forEach(function (n) { if (typeof d[n] === "string") form[n].value = d[n]; });
+    if (typeof d.servicio === "number" && d.servicio < form.servicio.options.length) form.servicio.selectedIndex = d.servicio;
+    updateExtras();
+  }
+
   var form = document.getElementById("contact-form");
+  if (form) {
+    restoreDraft();
+    updateExtras();
+    form.servicio.addEventListener("change", updateExtras);
+    form.addEventListener("input", saveDraft);
+    form.addEventListener("change", saveDraft);
+    form.correo.addEventListener("blur", function () { checkEmail(true); });
+    form.correo.addEventListener("input", function () { showMsg("msg-correo", form.correo, ""); });
+    form.telefono.addEventListener("blur", function () { checkPhone(true); });
+    form.telefono.addEventListener("input", function () { showMsg("msg-telefono", form.telefono, ""); });
+    document.getElementById("cc-list").addEventListener("click", saveDraft);
+  }
+
+  // Botón flotante de WhatsApp: se esconde cuando ya se ve la sección de contacto.
+  var fab = document.getElementById("wa-fab"), contactSection = document.getElementById("contacto");
+  if (fab && contactSection && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      fab.classList.toggle("is-hidden", entries[0].isIntersecting);
+    }, { threshold: 0.15 }).observe(contactSection);
+  }
+
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -471,7 +627,8 @@
         correo: form.correo.value.trim(),
         telefono: !rawPhone ? "" : rawPhone.charAt(0) === "+" ? rawPhone : "+" + DIAL[country.iso] + " " + rawPhone,
         servicio: form.servicio.value,
-        detalle: form.detalle.value.trim()
+        detalle: form.detalle.value.trim(),
+        extras: visibleExtras()
       };
 
       var missing = !data.nombre ? form.nombre
@@ -486,6 +643,12 @@
       }
       if (error) error.hidden = true;
 
+      // Un correo mal escrito no se deja pasar; un teléfono dudoso solo avisa si hay correo bueno.
+      var badEmail = data.correo && !checkEmail(true);
+      var badPhone = rawPhone && !checkPhone(true);
+      if (badEmail) { form.correo.focus(); return; }
+      if (badPhone && !data.correo) { form.telefono.focus(); return; }
+
       var url = whatsappUrl(buildMessage(data, t));
       // Ojo: pasar "noopener" como opción hace que window.open devuelva null aunque la
       // pestaña sí se abra, y entonces el respaldo de abajo se dispararía siempre,
@@ -498,6 +661,7 @@
         submit.dataset.sent = "1";
         submit.textContent = t.submitted;
       }
+      clearDraft();
     });
   }
 
