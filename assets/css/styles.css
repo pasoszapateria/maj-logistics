@@ -1021,6 +1021,8 @@ section[id] { scroll-margin-top: 76px; }
 input[aria-invalid="true"] { border-bottom-color: #c0392b; }
 .svc-extra { display: flex; flex-direction: column; gap: 14px; }
 .svc-extra .form-row[hidden] { display: none; }
+.svc-extra .form-row { align-items: end; }
+.svc-extra-note { margin: 0; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; color: var(--ink-3); }
 .field-wide { grid-column: 1 / -1; }
 .channel-actions { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 12px; }
 .action-btn {

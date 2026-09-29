@@ -38,7 +38,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css?v=4">
+<link rel="stylesheet" href="assets/css/styles.css?v=5">
 
 <!-- Marca que hay JavaScript ANTES de pintar: las animaciones de entrada parten de
      invisible, y sin esta clase el contenido se mostraría igual (sitio sin JS intacto). -->
@@ -482,16 +482,38 @@
           </label>
 
           <div class="svc-extra" id="svc-extra">
-            <div class="form-row" data-svc="2" hidden>
-              <label class="field"><span class="field-label" data-i18n="xBl">N.º DE BL O CONTENEDOR (OPCIONAL)</span><input type="text" name="x_bl" data-label="waBl" autocomplete="off"></label>
-              <label class="field"><span class="field-label" data-i18n="xPort">PUERTO DE ORIGEN (OPCIONAL)</span><input type="text" name="x_puerto" data-label="waPort" autocomplete="off"></label>
-            </div>
-            <div class="form-row" data-svc="3" hidden>
-              <label class="field"><span class="field-label" data-i18n="xAwb">N.º DE GUÍA AÉREA (OPCIONAL)</span><input type="text" name="x_guia" data-label="waAwb" autocomplete="off"></label>
-              <label class="field"><span class="field-label" data-i18n="xAirport">AEROPUERTO DE ORIGEN (OPCIONAL)</span><input type="text" name="x_aeropuerto" data-label="waAirport" autocomplete="off"></label>
+            <p class="svc-extra-note" data-i18n="xNote">DATOS DEL SERVICIO · OPCIONAL</p>
+            <div class="form-row" data-svc="0" hidden>
+              <label class="field"><span class="field-label" data-i18n="x0a">N.º DE BL O GUÍA AÉREA</span><input type="text" name="x0a" data-label="w0a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x0b">ADUANA O PUERTO DE LLEGADA</span><input type="text" name="x0b" data-label="w0b" autocomplete="off"></label>
             </div>
             <div class="form-row" data-svc="1" hidden>
-              <label class="field field-wide"><span class="field-label" data-i18n="xProduct">DESCRIPCIÓN DEL PRODUCTO (OPCIONAL)</span><input type="text" name="x_producto" data-label="waProduct" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x1a">DESCRIPCIÓN DEL PRODUCTO</span><input type="text" name="x1a" data-label="w1a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x1b">PAÍS DE ORIGEN</span><input type="text" name="x1b" data-label="w1b" autocomplete="off"></label>
+            </div>
+            <div class="form-row" data-svc="2" hidden>
+              <label class="field"><span class="field-label" data-i18n="x2a">N.º DE BL O CONTENEDOR</span><input type="text" name="x2a" data-label="w2a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x2b">PUERTO DE ORIGEN</span><input type="text" name="x2b" data-label="w2b" autocomplete="off"></label>
+            </div>
+            <div class="form-row" data-svc="3" hidden>
+              <label class="field"><span class="field-label" data-i18n="x3a">N.º DE GUÍA AÉREA</span><input type="text" name="x3a" data-label="w3a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x3b">AEROPUERTO DE ORIGEN</span><input type="text" name="x3b" data-label="w3b" autocomplete="off"></label>
+            </div>
+            <div class="form-row" data-svc="4" hidden>
+              <label class="field"><span class="field-label" data-i18n="x4a">ADUANA DE SALIDA</span><input type="text" name="x4a" data-label="w4a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x4b">ADUANA DE DESTINO</span><input type="text" name="x4b" data-label="w4b" autocomplete="off"></label>
+            </div>
+            <div class="form-row" data-svc="5" hidden>
+              <label class="field"><span class="field-label" data-i18n="x5a">N.º DE CONTENEDOR</span><input type="text" name="x5a" data-label="w5a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x5b">LUGAR DE ENTREGA</span><input type="text" name="x5b" data-label="w5b" autocomplete="off"></label>
+            </div>
+            <div class="form-row" data-svc="6" hidden>
+              <label class="field"><span class="field-label" data-i18n="x6a">TIPO DE MERCANCÍA</span><input type="text" name="x6a" data-label="w6a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x6b">TIEMPO ESTIMADO DE ALMACENAJE</span><input type="text" name="x6b" data-label="w6b" autocomplete="off"></label>
+            </div>
+            <div class="form-row" data-svc="7" hidden>
+              <label class="field"><span class="field-label" data-i18n="x7a">PRODUCTO</span><input type="text" name="x7a" data-label="w7a" autocomplete="off"></label>
+              <label class="field"><span class="field-label" data-i18n="x7b">ENTIDAD (SALUD, MAG, SENASA…)</span><input type="text" name="x7b" data-label="w7b" autocomplete="off"></label>
             </div>
           </div>
 
@@ -520,6 +542,6 @@
   <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M16.04 3C9.4 3 4 8.4 4 15.04c0 2.12.55 4.19 1.6 6.02L4 29l8.13-1.56a12 12 0 0 0 3.9.65C22.66 28.1 28 22.7 28 16.06 28 9.4 22.68 3 16.04 3Zm0 21.9c-1.2 0-2.38-.32-3.4-.93l-.5-.3-4.83.93.98-4.7-.33-.52a9.9 9.9 0 0 1-1.52-5.27c0-5.5 4.48-9.98 9.99-9.98 5.5 0 9.96 4.48 9.96 9.98 0 5.5-4.46 9.79-9.35 9.79Zm5.47-7.46c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.78-1.67-2.08-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.08 4.49.7.3 1.26.48 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg>
 </a>
 <script src="assets/js/vendor/libphonenumber-min.js?v=1" defer></script>
-<script src="assets/js/site.js?v=4" defer></script>
+<script src="assets/js/site.js?v=5" defer></script>
 </body>
 </html>

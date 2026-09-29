@@ -94,11 +94,18 @@
     waName: "Nombre", waCompany: "Empresa", waService: "Servicio",
     waEmail: "Correo", waPhone: "Teléfono", waDetail: "Detalle",
     ccSearch: "Buscar país…", ccLabel: "País",
-    xBl: "N.º DE BL O CONTENEDOR (OPCIONAL)", xPort: "PUERTO DE ORIGEN (OPCIONAL)",
-    xAwb: "N.º DE GUÍA AÉREA (OPCIONAL)", xAirport: "AEROPUERTO DE ORIGEN (OPCIONAL)",
-    xProduct: "DESCRIPCIÓN DEL PRODUCTO (OPCIONAL)",
-    waBl: "BL / contenedor", waPort: "Puerto de origen", waAwb: "Guía aérea",
-    waAirport: "Aeropuerto de origen", waProduct: "Producto",
+    x0a: "N.º DE BL O GUÍA AÉREA", x0b: "ADUANA O PUERTO DE LLEGADA",
+    x1a: "DESCRIPCIÓN DEL PRODUCTO", x1b: "PAÍS DE ORIGEN", x2a: "N.º DE BL O CONTENEDOR",
+    x2b: "PUERTO DE ORIGEN", x3a: "N.º DE GUÍA AÉREA", x3b: "AEROPUERTO DE ORIGEN",
+    x4a: "ADUANA DE SALIDA", x4b: "ADUANA DE DESTINO", x5a: "N.º DE CONTENEDOR",
+    x5b: "LUGAR DE ENTREGA", x6a: "TIPO DE MERCANCÍA", x6b: "TIEMPO ESTIMADO DE ALMACENAJE",
+    x7a: "PRODUCTO", x7b: "ENTIDAD (SALUD, MAG, SENASA…)",
+    xNote: "DATOS DEL SERVICIO · OPCIONAL", w0a: "N.º de BL o guía aérea",
+    w0b: "Aduana o puerto de llegada", w1a: "Descripción del producto", w1b: "País de origen",
+    w2a: "N.º de BL o contenedor", w2b: "Puerto de origen", w3a: "N.º de guía aérea",
+    w3b: "Aeropuerto de origen", w4a: "Aduana de salida", w4b: "Aduana de destino",
+    w5a: "N.º de contenedor", w5b: "Lugar de entrega", w6a: "Tipo de mercancía",
+    w6b: "Tiempo estimado de almacenaje", w7a: "Producto", w7b: "Entidad (Salud, MAG, Senasa…)",
     callLabel: "Llamar", saveLabel: "Guardar contacto", fabLabel: "Escribir por WhatsApp",
     vEmail: "Revise el correo: parece incompleto.", vEmailDid: "¿Quiso decir",
     vPhone: "El número parece incompleto para este país."
@@ -135,11 +142,18 @@
     waName: "Name", waCompany: "Company", waService: "Service",
     waEmail: "Email", waPhone: "Phone", waDetail: "Details",
     ccSearch: "Search country…", ccLabel: "Country",
-    xBl: "BL OR CONTAINER NO. (OPTIONAL)", xPort: "PORT OF ORIGIN (OPTIONAL)",
-    xAwb: "AIR WAYBILL NO. (OPTIONAL)", xAirport: "AIRPORT OF ORIGIN (OPTIONAL)",
-    xProduct: "PRODUCT DESCRIPTION (OPTIONAL)",
-    waBl: "BL / container", waPort: "Port of origin", waAwb: "Air waybill",
-    waAirport: "Airport of origin", waProduct: "Product",
+    x0a: "BL OR AIR WAYBILL NO.", x0b: "CUSTOMS OFFICE OR PORT OF ARRIVAL",
+    x1a: "PRODUCT DESCRIPTION", x1b: "COUNTRY OF ORIGIN", x2a: "BL OR CONTAINER NO.",
+    x2b: "PORT OF ORIGIN", x3a: "AIR WAYBILL NO.", x3b: "AIRPORT OF ORIGIN",
+    x4a: "DEPARTURE CUSTOMS OFFICE", x4b: "DESTINATION CUSTOMS OFFICE", x5a: "CONTAINER NO.",
+    x5b: "DELIVERY LOCATION", x6a: "TYPE OF GOODS", x6b: "ESTIMATED STORAGE TIME",
+    x7a: "PRODUCT", x7b: "AGENCY (HEALTH, MAG, SENASA…)", xNote: "SERVICE DETAILS · OPTIONAL",
+    w0a: "BL or air waybill no.", w0b: "Customs office or port of arrival",
+    w1a: "Product description", w1b: "Country of origin", w2a: "BL or container no.",
+    w2b: "Port of origin", w3a: "Air waybill no.", w3b: "Airport of origin",
+    w4a: "Departure customs office", w4b: "Destination customs office", w5a: "Container no.",
+    w5b: "Delivery location", w6a: "Type of goods", w6b: "Estimated storage time",
+    w7a: "Product", w7b: "Agency (Health, MAG, Senasa…)",
     callLabel: "Call", saveLabel: "Save contact", fabLabel: "Message us on WhatsApp",
     vEmail: "Please check the email: it looks incomplete.", vEmailDid: "Did you mean",
     vPhone: "This number looks incomplete for this country."
@@ -625,7 +639,7 @@
 
   // Borrador: lo escrito sobrevive a un cierre accidental de la pestaña.
   var DRAFT_KEY = "maj-draft";
-  var DRAFT_FIELDS = ["nombre", "empresa", "correo", "telefono", "detalle", "x_bl", "x_puerto", "x_guia", "x_aeropuerto", "x_producto"];
+  var DRAFT_FIELDS = ["nombre", "empresa", "correo", "telefono", "detalle", "x0a", "x0b", "x1a", "x1b", "x2a", "x2b", "x3a", "x3b", "x4a", "x4b", "x5a", "x5b", "x6a", "x6b", "x7a", "x7b"];
   function saveDraft() {
     if (!form) return;
     var d = { pais: country.iso, servicio: form.servicio.selectedIndex };
