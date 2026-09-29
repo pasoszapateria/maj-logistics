@@ -440,8 +440,17 @@
             <div class="field">
               <span class="field-label" id="phone-label" data-i18n="fPhone">TELÉFONO</span>
               <div class="phone-group">
-                <select name="pais" id="phone-country" aria-label="País" autocomplete="off"></select>
-                <input type="tel" name="telefono" inputmode="tel" autocomplete="tel-national" aria-labelledby="phone-label">
+                <div class="cc" id="phone-country">
+                  <button type="button" class="cc-btn" id="cc-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="País">
+                    <span class="cc-flag"></span><span class="cc-code"></span>
+                  </button>
+                  <div class="cc-panel" id="cc-panel" hidden>
+                    <input type="text" class="cc-search" id="cc-search" placeholder="Buscar país…" autocomplete="off" aria-label="Buscar país">
+                    <ul class="cc-list" id="cc-list" role="listbox"></ul>
+                  </div>
+                  <input type="hidden" name="pais" id="cc-value" value="CR">
+                </div>
+                <input type="tel" name="telefono" id="phone-input" inputmode="tel" autocomplete="tel-national" aria-labelledby="phone-label">
               </div>
             </div>
           </div>

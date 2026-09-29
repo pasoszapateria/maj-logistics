@@ -92,7 +92,8 @@
     submit: "Enviar", submitted: "Abriendo WhatsApp ✓",
     waIntro: "Hola M.A.J Logistics, escribo desde la página web.",
     waName: "Nombre", waCompany: "Empresa", waService: "Servicio",
-    waEmail: "Correo", waPhone: "Teléfono", waDetail: "Detalle"
+    waEmail: "Correo", waPhone: "Teléfono", waDetail: "Detalle",
+    ccSearch: "Buscar país…", ccLabel: "País"
   };
 
   var EN = {
@@ -124,7 +125,8 @@
     submit: "Send", submitted: "Opening WhatsApp ✓",
     waIntro: "Hello M.A.J Logistics, I am writing from your website.",
     waName: "Name", waCompany: "Company", waService: "Service",
-    waEmail: "Email", waPhone: "Phone", waDetail: "Details"
+    waEmail: "Email", waPhone: "Phone", waDetail: "Details",
+    ccSearch: "Search country…", ccLabel: "Country"
   };
 
   function expand(dict, services, steps, faqs) {
@@ -151,41 +153,179 @@
   var lang = "es";
 
   /* --------------------------------------------------------------- teléfonos */
-  // Código ISO -> prefijo telefónico. El nombre del país sale de Intl.DisplayNames,
-  // así cambia solo entre español e inglés; la bandera se arma con el código ISO.
-  var DIAL = {
-    CR: "506", PA: "507", NI: "505", HN: "504", SV: "503", GT: "502", BZ: "501",
-    MX: "52", CO: "57", VE: "58", EC: "593", PE: "51", BO: "591", CL: "56",
-    AR: "54", UY: "598", PY: "595", BR: "55", DO: "1809", CU: "53", PR: "1787",
-    US: "1", CA: "1", ES: "34", FR: "33", DE: "49", IT: "39", NL: "31",
-    BE: "32", PT: "351", GB: "44", CH: "41", SE: "46", CN: "86", HK: "852",
-    TW: "886", JP: "81", KR: "82", IN: "91", TR: "90", AE: "971", IL: "972",
-    AU: "61", ZA: "27"
+  // Código ISO -> prefijo telefónico. El nombre sale de Intl.DisplayNames (cambia solo
+  // entre español e inglés) y la bandera se arma con el código ISO. Los países que
+  // comparten el +1 (EE. UU., Canadá, Caribe) se escriben igual: (###) ###-####.
+  var DIAL = {};
+  ("AD376 AE971 AF93 AG1 AI1 AL355 AM374 AO244 AR54 AS1 AT43 AU61 AW297 AX358 AZ994 BA387 BB1 " +
+   "BD880 BE32 BF226 BG359 BH973 BI257 BJ229 BL590 BM1 BN673 BO591 BQ599 BR55 BS1 BT975 BW267 " +
+   "BY375 BZ501 CA1 CC61 CD243 CF236 CG242 CH41 CI225 CK682 CL56 CM237 CN86 CO57 CR506 CU53 " +
+   "CV238 CW599 CX61 CY357 CZ420 DE49 DJ253 DK45 DM1 DO1 DZ213 EC593 EE372 EG20 ER291 ES34 " +
+   "ET251 FI358 FJ679 FK500 FM691 FO298 FR33 GA241 GB44 GD1 GE995 GF594 GG44 GH233 GI350 GL299 " +
+   "GM220 GN224 GP590 GQ240 GR30 GT502 GU1 GW245 GY592 HK852 HN504 HR385 HT509 HU36 ID62 IE353 " +
+   "IL972 IM44 IN91 IQ964 IR98 IS354 IT39 JE44 JM1 JO962 JP81 KE254 KG996 KH855 KI686 KM269 KN1 " +
+   "KP850 KR82 KW965 KY1 KZ7 LA856 LB961 LC1 LI423 LK94 LR231 LS266 LT370 LU352 LV371 LY218 " +
+   "MA212 MC377 MD373 ME382 MF590 MG261 MH692 MK389 ML223 MM95 MN976 MO853 MP1 MQ596 MR222 MS1 " +
+   "MT356 MU230 MV960 MW265 MX52 MY60 MZ258 NA264 NC687 NE227 NF672 NG234 NI505 NL31 NO47 NP977 " +
+   "NR674 NU683 NZ64 OM968 PA507 PE51 PF689 PG675 PH63 PK92 PL48 PM508 PR1 PS970 PT351 PW680 " +
+   "PY595 QA974 RE262 RO40 RS381 RU7 RW250 SA966 SB677 SC248 SD249 SE46 SG65 SH290 SI386 SK421 " +
+   "SL232 SM378 SN221 SO252 SR597 SS211 ST239 SV503 SX1 SY963 SZ268 TC1 TD235 TG228 TH66 TJ992 " +
+   "TK690 TL670 TM993 TN216 TO676 TR90 TT1 TV688 TW886 TZ255 UA380 UG256 US1 UY598 UZ998 VA39 " +
+   "VC1 VE58 VG1 VI1 VN84 VU678 WF681 WS685 XK383 YE967 YT262 ZA27 ZM260 ZW263").split(" ").forEach(function (x) {
+    DIAL[x.slice(0, 2)] = x.slice(2);
+  });
+
+  // Formato de escritura por país (# = dígito). Los que no están se dejan como se escriban.
+  var NANP = "(###) ###-####";
+  var MASK = {
+    CR: "####-####", PA: "####-####", GT: "####-####", SV: "####-####", HN: "####-####",
+    NI: "####-####", MX: "## #### ####", CO: "### ### ####", VE: "###-#######",
+    EC: "## ### ####", PE: "### ### ###", CL: "# #### ####", AR: "## ####-####",
+    BR: "## #####-####", UY: "## ### ###", PY: "### ######", ES: "### ## ## ##",
+    FR: "# ## ## ## ##", IT: "### ### ####", GB: "#### ######", CN: "### #### ####",
+    IN: "##### #####", JP: "##-####-####", KR: "##-####-####"
   };
+  Object.keys(DIAL).forEach(function (iso) { if (DIAL[iso] === "1") MASK[iso] = NANP; });
+
   function flagOf(iso) {
     return String.fromCodePoint.apply(null, iso.split("").map(function (c) {
       return 127397 + c.charCodeAt(0);
     }));
   }
-  function fillCountries() {
-    var sel = document.getElementById("phone-country");
-    if (!sel) return;
+  function plain(str) {   // minúsculas y sin tildes, para buscar "peru" y hallar "Perú"
+    return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  }
+  // Aplica la máscara; el separador solo aparece cuando viene otro dígito detrás,
+  // así el botón de borrar no se atasca en un guion.
+  function formatPhone(iso, raw) {
+    var digits = raw.replace(/\D/g, "").replace(/^0+/, "");
+    var mask = MASK[iso];
+    if (!mask) return digits;
+    var out = "", d = 0;
+    for (var i = 0; i < mask.length && d < digits.length; i++) {
+      if (mask.charAt(i) === "#") out += digits.charAt(d++);
+      else out += mask.charAt(i);
+    }
+    return out + digits.slice(d);
+  }
+
+  var country = { iso: "CR", list: [], active: 0 };
+  var ccEl = {
+    wrap: document.getElementById("phone-country"),
+    btn: document.getElementById("cc-btn"),
+    panel: document.getElementById("cc-panel"),
+    search: document.getElementById("cc-search"),
+    listEl: document.getElementById("cc-list"),
+    hidden: document.getElementById("cc-value"),
+    phone: document.getElementById("phone-input")
+  };
+
+  function buildCountries() {
     var names = null;
     try { names = new Intl.DisplayNames([lang], { type: "region" }); } catch (e) { /* navegador viejo */ }
-    var keep = sel.value || "CR";
-    var list = Object.keys(DIAL).map(function (iso) {
-      return { iso: iso, name: names ? names.of(iso) : iso };
+    country.list = Object.keys(DIAL).map(function (iso) {
+      var name = names ? names.of(iso) : iso;
+      return { iso: iso, name: name, key: plain(name) };
     }).sort(function (a, b) { return a.name.localeCompare(b.name, lang); });
-    // Costa Rica primero: es de donde escribe la mayoría.
-    list.sort(function (a, b) { return (b.iso === "CR") - (a.iso === "CR"); });
-    sel.innerHTML = "";
-    list.forEach(function (c) {
-      var o = document.createElement("option");
-      o.value = c.iso;
-      o.textContent = flagOf(c.iso) + " " + c.name + " +" + DIAL[c.iso];
-      sel.appendChild(o);
+  }
+
+  function renderCountries() {
+    if (!ccEl.wrap) return;
+    var q = plain(ccEl.search.value.trim().replace(/^\+/, ""));
+    var shown = country.list.filter(function (c) {
+      return !q || c.key.indexOf(q) !== -1 || DIAL[c.iso].indexOf(q) === 0 || c.iso.toLowerCase() === q;
     });
-    sel.value = keep;
+    if (q) shown.sort(function (a, b) {          // primero los que empiezan con lo escrito
+      return (b.key.indexOf(q) === 0) - (a.key.indexOf(q) === 0);
+    });
+    else shown.sort(function (a, b) { return (b.iso === "CR") - (a.iso === "CR"); });   // Costa Rica primero
+    country.shown = shown;
+    country.active = 0;
+    ccEl.listEl.innerHTML = "";
+    ccEl.listEl.scrollTop = 0;
+    shown.forEach(function (c, i) {
+      var li = document.createElement("li");
+      li.setAttribute("role", "option");
+      li.id = "cc-opt-" + c.iso;
+      li.dataset.iso = c.iso;
+      li.textContent = flagOf(c.iso) + "  " + c.name + "  +" + DIAL[c.iso];
+      if (c.iso === country.iso) li.setAttribute("aria-selected", "true");
+      if (i === 0) li.classList.add("is-active");
+      ccEl.listEl.appendChild(li);
+    });
+  }
+
+  function paintButton() {
+    ccEl.btn.querySelector(".cc-flag").textContent = flagOf(country.iso);
+    ccEl.btn.querySelector(".cc-code").textContent = "+" + DIAL[country.iso];
+    ccEl.hidden.value = country.iso;
+    var m = MASK[country.iso];
+    ccEl.phone.placeholder = m ? m.replace(/#/g, "8") : "";
+  }
+
+  function pickCountry(iso) {
+    country.iso = iso;
+    paintButton();
+    ccEl.phone.value = formatPhone(iso, ccEl.phone.value);
+    closeCountries();
+    ccEl.phone.focus();
+  }
+  function openCountries() {
+    ccEl.panel.hidden = false;
+    ccEl.btn.setAttribute("aria-expanded", "true");
+    ccEl.search.value = "";
+    renderCountries();
+    var sel = ccEl.listEl.querySelector('[aria-selected="true"]');
+    if (sel) sel.scrollIntoView({ block: "nearest" });
+    ccEl.search.focus();
+  }
+  function closeCountries() {
+    ccEl.panel.hidden = true;
+    ccEl.btn.setAttribute("aria-expanded", "false");
+  }
+  function moveActive(step) {
+    var items = ccEl.listEl.children;
+    if (!items.length) return;
+    items[country.active].classList.remove("is-active");
+    country.active = (country.active + step + items.length) % items.length;
+    items[country.active].classList.add("is-active");
+    items[country.active].scrollIntoView({ block: "nearest" });
+  }
+
+  if (ccEl.wrap) {
+    buildCountries();
+    paintButton();
+    ccEl.btn.addEventListener("click", function () {
+      if (ccEl.panel.hidden) openCountries(); else closeCountries();
+    });
+    ccEl.search.addEventListener("input", renderCountries);
+    ccEl.search.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowDown") { e.preventDefault(); moveActive(1); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); moveActive(-1); }
+      else if (e.key === "Enter") {
+        e.preventDefault();
+        var c = country.shown[country.active];
+        if (c) pickCountry(c.iso);
+      } else if (e.key === "Escape") { closeCountries(); ccEl.btn.focus(); }
+    });
+    ccEl.listEl.addEventListener("click", function (e) {
+      var li = e.target.closest("li");
+      if (li) pickCountry(li.dataset.iso);
+    });
+    document.addEventListener("click", function (e) {
+      if (!ccEl.panel.hidden && !ccEl.wrap.contains(e.target)) closeCountries();
+    });
+    ccEl.phone.addEventListener("input", function () {
+      var v = ccEl.phone.value;
+      if (v.charAt(0) === "+") return;                       // pegó el número completo con su código
+      if (ccEl.phone.selectionStart !== v.length) return;    // editando a la mitad: no mover el cursor
+      ccEl.phone.value = formatPhone(country.iso, v);
+    });
+  }
+  function fillCountries() {   // al cambiar de idioma
+    if (!ccEl.wrap) return;
+    buildCountries();
+    if (!ccEl.panel.hidden) renderCountries();
   }
 
   /* ----------------------------------------------------------------- idioma */
@@ -213,6 +353,7 @@
     });
 
     fillCountries();
+    if (ccEl.wrap) { ccEl.search.placeholder = t.ccSearch; ccEl.btn.setAttribute("aria-label", t.ccLabel); }
 
     document.querySelectorAll(".pill").forEach(function (btn) {
       var active = btn.getAttribute("data-lang") === next;
@@ -323,12 +464,12 @@
       var error = document.getElementById("form-error");
       var submit = form.querySelector(".form-submit");
 
-      var rawPhone = form.telefono.value.trim().replace(/^[\s0]+/, "");
+      var rawPhone = form.telefono.value.trim();
       var data = {
         nombre: form.nombre.value.trim(),
         empresa: form.empresa.value.trim(),
         correo: form.correo.value.trim(),
-        telefono: !rawPhone ? "" : rawPhone.charAt(0) === "+" ? rawPhone : "+" + DIAL[form.pais.value] + " " + rawPhone,
+        telefono: !rawPhone ? "" : rawPhone.charAt(0) === "+" ? rawPhone : "+" + DIAL[country.iso] + " " + rawPhone,
         servicio: form.servicio.value,
         detalle: form.detalle.value.trim()
       };
