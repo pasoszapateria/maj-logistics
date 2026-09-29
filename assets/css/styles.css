@@ -1022,12 +1022,21 @@ input[aria-invalid="true"] { border-bottom-color: #c0392b; }
 .svc-extra { display: flex; flex-direction: column; gap: 14px; }
 .svc-extra .form-row[hidden] { display: none; }
 .field-wide { grid-column: 1 / -1; }
-.channel-actions {
-  margin: 0; display: flex; gap: 10px; align-items: center;
-  font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; color: var(--blue-pale);
+.channel-actions { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 12px; }
+.action-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 12px 22px; flex: 1 1 170px;
+  font-family: var(--display); font-size: 15px; font-weight: 700; line-height: 1.2;
+  border: 2px solid var(--white); text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
 }
-.channel-actions a { color: var(--white); text-decoration: underline; text-underline-offset: 3px; }
-.channel-actions a:hover { color: var(--blue-pale); }
+.channel-value a.action-btn, .channel-actions a.action-btn { color: inherit; }
+.action-call { background: var(--white); color: var(--blue) !important; }
+.action-call:hover { background: var(--blue-pale); border-color: var(--blue-pale); }
+.action-save { background: transparent; color: var(--white) !important; }
+.action-save:hover { background: var(--white); color: var(--blue) !important; }
+.action-btn:focus-visible { outline: 3px solid var(--blue-pale); outline-offset: 3px; }
+.action-btn svg { flex: none; }
 .wa-fab {
   position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40;
   width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center;

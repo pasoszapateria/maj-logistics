@@ -191,17 +191,60 @@
     DIAL[x.slice(0, 2)] = x.slice(2);
   });
 
-  // Formato de escritura por país (# = dígito). Los que no están se dejan como se escriban.
-  var NANP = "(###) ###-####";
-  var MASK = {
-    CR: "####-####", PA: "####-####", GT: "####-####", SV: "####-####", HN: "####-####",
-    NI: "####-####", MX: "## #### ####", CO: "### ### ####", VE: "###-#######",
-    EC: "## ### ####", PE: "### ### ###", CL: "# #### ####", AR: "## ####-####",
-    BR: "## #####-####", UY: "## ### ###", PY: "### ######", ES: "### ## ## ##",
-    FR: "# ## ## ## ##", IT: "### ### ####", GB: "#### ######", CN: "### #### ####",
-    IN: "##### #####", JP: "##-####-####", KR: "##-####-####"
+  // Formato de escritura por país (# = dígito), generado del número móvil de ejemplo de cada
+  // país. Es una máscara fija: acomoda cualquier número que se escriba, sea válido o no.
+  var MASK = {};
+  var MASK_SRC = {
+    "#####": "AC FK SH",
+    "### ###": "AD",
+    "## ### ####": "AE AF AL CG EC ET GH HR HU IE IL LK LR MY MZ NA NZ SA SD TH TJ UA ZA ZW",
+    "(###) ###-####": "AG AI AS BB BM BS CA DM DO GD GU JM KN KY LC MP MS PR SX TC TT US VC VG VI",
+    "## ######": "AM CY SL TM",
+    "### ### ###": "AO AU CC CD CX CZ GQ GW ID KG LI LU PE PL PS PT RO RW SK SS SY TW TZ VN YE",
+    "# ## #### ####": "AR",
+    "### ######": "AT KE PY UG",
+    "### ####": "AW BN BQ BZ FJ FM GM GY IO IS MH MV NR NU PW SR ST TO VU",
+    "## #######": "AX FI LY RS ZM",
+    "## ### ## ##": "AZ BY CH SE SN UZ",
+    "## ### ###": "BA BG BW KH LB LV ME MK SI TN UY XK",
+    "#### ######": "BD GB GG IM JE",
+    "### ## ## ##": "BE BL DZ ES GE GF GN GP MF MQ MW RE YT",
+    "## ## ## ##": "BF BI BT CF DJ DK GA ML MR NE NO PF SJ SM TD TG",
+    "#### ####": "BH BO EE GI HK KI LS MN MO MT MU OM PG QA SG SZ TL",
+    "## ## ## ## ##": "BJ",
+    "## ##### ####": "BR",
+    "## ## ## ####": "CI",
+    "## ###": "CK",
+    "# #### ####": "CL JO",
+    "# ## ## ## ##": "CM EH FR MA MC",
+    "### #### ####": "CN",
+    "### #######": "CO NP PK VE",
+    "####-####": "CR GT HN NI PA SV",
+    "# #######": "CU SO",
+    "### ## ##": "CV KM",
+    "# ### ####": "CW MM",
+    "#### #######": "DE",
+    "## ########": "EG",
+    "# ### ###": "ER SC",
+    "## ## ##": "FO GL NC PM WF",
+    "### ### ####": "GR IQ IR IT KP KZ MX NG PH VA",
+    "## ## ####": "HT",
+    "##### #####": "IN",
+    "## #### ####": "JP KR",
+    "### #####": "KW LT",
+    "## ## ### ###": "LA",
+    "### ## ###": "MD",
+    "## ## ### ##": "MG",
+    "# #####": "NF",
+    "# ########": "NL",
+    "### ### ## ##": "RU TR",
+    "## #####": "SB WS",
+    "####": "TA TK",
+    "## ####": "TV"
   };
-  Object.keys(DIAL).forEach(function (iso) { if (DIAL[iso] === "1") MASK[iso] = NANP; });
+  Object.keys(MASK_SRC).forEach(function (mask) {
+    MASK_SRC[mask].split(" ").forEach(function (iso) { MASK[iso] = mask; });
+  });
 
   function flagOf(iso) {
     return String.fromCodePoint.apply(null, iso.split("").map(function (c) {
@@ -214,28 +257,15 @@
   // Aplica la máscara; el separador solo aparece cuando viene otro dígito detrás,
   // así el botón de borrar no se atasca en un guion.
   function formatPhone(iso, raw) {
-    var digits = raw.replace(/\D/g, "");
+    var digits = raw.replace(/\D/g, "").replace(/^0+/, "");
     var mask = MASK[iso];
-    if (!mask) {
-      digits = digits.replace(/^0+/, "");
-      if (window.libphonenumber && digits) {
-        // Se formatea como número internacional y se le quita el prefijo: así agrupa bien
-        // aunque el cliente no escriba el 0 nacional (Alemania, Emiratos, Nigeria…).
-        try {
-          var prefix = "+" + DIAL[iso];
-          var out = new libphonenumber.AsYouType().input(prefix + digits);
-          if (out.indexOf(prefix) === 0) return out.slice(prefix.length).trim();
-        } catch (e) { /* cae a dígitos */ }
-      }
-      return digits;
-    }
-    digits = digits.replace(/^0+/, "");
+    if (!mask) return digits;
     var out = "", d = 0;
     for (var i = 0; i < mask.length && d < digits.length; i++) {
       if (mask.charAt(i) === "#") out += digits.charAt(d++);
       else out += mask.charAt(i);
     }
-    return out + digits.slice(d);
+    return d < digits.length ? out + " " + digits.slice(d) : out;
   }
   // true = válido, false = incompleto o imposible, null = no se puede saber (sin librería)
   function phoneIsValid(iso, text) {
@@ -246,6 +276,17 @@
     } catch (e) { return null; }
   }
 
+  // "+34 612..." -> "ES". Para +1 (varios países) se deja el que ya estaba elegido.
+  function countryFromInternational(v) {
+    if (!window.libphonenumber) return null;
+    try {
+      var n = libphonenumber.parsePhoneNumberFromString(v);
+      if (n && n.country && DIAL[n.country]) return n.country;
+      var digits = v.replace(/\D/g, "");
+      if (digits.charAt(0) === "1") return DIAL[country.iso] === "1" ? country.iso : "US";
+    } catch (e) { /* sin reconocer */ }
+    return null;
+  }
   var country = { iso: "CR", list: [], active: 0 };
   var ccEl = {
     wrap: document.getElementById("phone-country"),
@@ -353,10 +394,23 @@
       if (!ccEl.panel.hidden && !ccEl.wrap.contains(e.target)) closeCountries();
     });
     ccEl.phone.addEventListener("input", function () {
-      var v = ccEl.phone.value;
-      if (v.charAt(0) === "+") return;                       // pegó el número completo con su código
-      if (ccEl.phone.selectionStart !== v.length) return;    // editando a la mitad: no mover el cursor
-      ccEl.phone.value = formatPhone(country.iso, v);
+      var el = ccEl.phone, v = el.value;
+      if (v.charAt(0) === "+") {                              // pegó el número con su código de país
+        var iso = countryFromInternational(v);
+        if (!iso) return;
+        country.iso = iso; paintButton();
+        var n = libphonenumber.parsePhoneNumberFromString(v);
+        v = n ? n.nationalNumber : v.replace(/\D/g, "").slice(DIAL[iso].length);
+      }
+      // Se cuenta cuántos dígitos quedan a la izquierda del cursor para devolverlo ahí.
+      var caret = el.selectionStart, before = v.slice(0, caret).replace(/\D/g, "").length;
+      if (before === 0 && caret > 0) before = 0;
+      var f = formatPhone(country.iso, v);
+      el.value = f;
+      var pos = 0, seen = 0;
+      while (pos < f.length && seen < before) { if (/\d/.test(f.charAt(pos))) seen++; pos++; }
+      if (before >= f.replace(/\D/g, "").length) pos = f.length;
+      try { el.setSelectionRange(pos, pos); } catch (e) { /* sin selección */ }
     });
   }
   function fillCountries() {   // al cambiar de idioma
@@ -587,6 +641,7 @@
     if (!d) return;
     if (d.pais && DIAL[d.pais]) { country.iso = d.pais; paintButton(); }
     DRAFT_FIELDS.forEach(function (n) { if (typeof d[n] === "string") form[n].value = d[n]; });
+    form.telefono.value = formatPhone(country.iso, form.telefono.value);
     if (typeof d.servicio === "number" && d.servicio < form.servicio.options.length) form.servicio.selectedIndex = d.servicio;
     updateExtras();
   }
