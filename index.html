@@ -437,10 +437,13 @@
               <span class="field-label" data-i18n="fEmail">CORREO</span>
               <input type="email" name="correo" autocomplete="email">
             </label>
-            <label class="field">
-              <span class="field-label" data-i18n="fPhone">TELÉFONO</span>
-              <input type="tel" name="telefono" autocomplete="tel">
-            </label>
+            <div class="field">
+              <span class="field-label" id="phone-label" data-i18n="fPhone">TELÉFONO</span>
+              <div class="phone-group">
+                <select name="pais" id="phone-country" aria-label="País" autocomplete="off"></select>
+                <input type="tel" name="telefono" inputmode="tel" autocomplete="tel-national" aria-labelledby="phone-label">
+              </div>
+            </div>
           </div>
 
           <label class="field">

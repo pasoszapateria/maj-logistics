@@ -650,6 +650,11 @@ section[id] { scroll-margin-top: 76px; }
   background-position: right 1px center;
   cursor: pointer;
 }
+.form-row .field:has(.phone-group),
+.form-row .field:has(input[type="email"]) { grid-column: 1 / -1; }
+.phone-group { display: flex; gap: 10px; align-items: flex-end; }
+.phone-group select { flex: 0 0 min(15rem, 50%); min-width: 0; text-overflow: ellipsis; }
+.phone-group input { flex: 1; min-width: 0; }
 .field textarea {
   border: 1px solid var(--line-2);
   padding: 11px 12px;

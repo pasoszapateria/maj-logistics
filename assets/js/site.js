@@ -150,6 +150,44 @@
 
   var lang = "es";
 
+  /* --------------------------------------------------------------- teléfonos */
+  // Código ISO -> prefijo telefónico. El nombre del país sale de Intl.DisplayNames,
+  // así cambia solo entre español e inglés; la bandera se arma con el código ISO.
+  var DIAL = {
+    CR: "506", PA: "507", NI: "505", HN: "504", SV: "503", GT: "502", BZ: "501",
+    MX: "52", CO: "57", VE: "58", EC: "593", PE: "51", BO: "591", CL: "56",
+    AR: "54", UY: "598", PY: "595", BR: "55", DO: "1809", CU: "53", PR: "1787",
+    US: "1", CA: "1", ES: "34", FR: "33", DE: "49", IT: "39", NL: "31",
+    BE: "32", PT: "351", GB: "44", CH: "41", SE: "46", CN: "86", HK: "852",
+    TW: "886", JP: "81", KR: "82", IN: "91", TR: "90", AE: "971", IL: "972",
+    AU: "61", ZA: "27"
+  };
+  function flagOf(iso) {
+    return String.fromCodePoint.apply(null, iso.split("").map(function (c) {
+      return 127397 + c.charCodeAt(0);
+    }));
+  }
+  function fillCountries() {
+    var sel = document.getElementById("phone-country");
+    if (!sel) return;
+    var names = null;
+    try { names = new Intl.DisplayNames([lang], { type: "region" }); } catch (e) { /* navegador viejo */ }
+    var keep = sel.value || "CR";
+    var list = Object.keys(DIAL).map(function (iso) {
+      return { iso: iso, name: names ? names.of(iso) : iso };
+    }).sort(function (a, b) { return a.name.localeCompare(b.name, lang); });
+    // Costa Rica primero: es de donde escribe la mayoría.
+    list.sort(function (a, b) { return (b.iso === "CR") - (a.iso === "CR"); });
+    sel.innerHTML = "";
+    list.forEach(function (c) {
+      var o = document.createElement("option");
+      o.value = c.iso;
+      o.textContent = flagOf(c.iso) + " " + c.name + " +" + DIAL[c.iso];
+      sel.appendChild(o);
+    });
+    sel.value = keep;
+  }
+
   /* ----------------------------------------------------------------- idioma */
   function applyLang(next) {
     var t = DICT[next];
@@ -173,6 +211,8 @@
         if (typeof value === "string") el.setAttribute(parts[0], value);
       });
     });
+
+    fillCountries();
 
     document.querySelectorAll(".pill").forEach(function (btn) {
       var active = btn.getAttribute("data-lang") === next;
@@ -207,6 +247,7 @@
     try { initial = localStorage.getItem("maj-lang"); } catch (e) { initial = null; }
   }
   if (initial === "en") applyLang("en");
+  else fillCountries();
 
   /* ---------------------------------------------------- preguntas frecuentes */
   var faqButtons = Array.prototype.slice.call(document.querySelectorAll(".faq-q"));
@@ -282,11 +323,12 @@
       var error = document.getElementById("form-error");
       var submit = form.querySelector(".form-submit");
 
+      var rawPhone = form.telefono.value.trim().replace(/^[\s0]+/, "");
       var data = {
         nombre: form.nombre.value.trim(),
         empresa: form.empresa.value.trim(),
         correo: form.correo.value.trim(),
-        telefono: form.telefono.value.trim(),
+        telefono: !rawPhone ? "" : rawPhone.charAt(0) === "+" ? rawPhone : "+" + DIAL[form.pais.value] + " " + rawPhone,
         servicio: form.servicio.value,
         detalle: form.detalle.value.trim()
       };
